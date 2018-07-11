@@ -18,7 +18,7 @@ class DataGenerator():
 
         self.start_time = timezone.now()
 
-        print("Start: %(start_time)s" % {
+        print("Started at: %(start_time)s" % {
             'start_time': self.start_time})
 
         try:
@@ -41,8 +41,8 @@ class DataGenerator():
 
         import_duration = (self.end_time - self.start_time).total_seconds()
 
-        print("End:%s" % str(self.end_time))
-        print("Duration:%s" % import_duration)
+        print("Ended at: %s" % str(self.end_time))
+        print("Duration (secs): %s" % import_duration)
 
         if error:
             print("Error!!!")
@@ -52,6 +52,7 @@ class DataGenerator():
         """
         Empty any entries in the DB!
         """
+        print("Emptying DB")
         CMSPlugin.objects.all().delete()
         Placeholder.objects.all().delete()
         Title.objects.all().delete()
@@ -61,10 +62,15 @@ class DataGenerator():
 
     def generate(self):
 
+        print("Populating DB")
+
         # Generate pages
-        amount_of_pages = range(1, 10)
-        amount_of_plugins = range(1, 10)
+        amount_of_pages = range(0, settings.GENERATOR_PAGE_NUMBERS)
         languages = settings.LANGUAGES
+        homepage_set = False
+
+        # Use the homepage as the first template
+        page_template = 'homepage.html'
 
         for page_index, page_arg in enumerate(amount_of_pages):
 
@@ -80,21 +86,39 @@ class DataGenerator():
 
                 # Create a new page or title
                 if page is None:
-                    page = create_page(page_title, "homepage.html", language_code, published=True)
+                    page = create_page(page_title, page_template, language_code, in_navigation=True, published=True)
                 else:
                     create_title(language_code, page_title, page)
 
+                # FIXME: Get the placeholders available from the pages
                 # Add the plugins to the page
-                placeholder = page.placeholders.get(slot='placeholder_1')
-                for plugin in enumerate(range(0, random.choice(amount_of_plugins) )):
+                for placeholder in page.placeholders.all():
+                    # Add a text plugin
                     add_plugin(
                         placeholder=placeholder,
                         plugin_type="TextPlugin",
                         language=language_code,
                         body=translated_text,
                     )
+                    """
+                    for plugin in enumerate(range(0, random.choice(amount_of_plugins) )):
+                        add_plugin(
+                            placeholder=placeholder,
+                            plugin_type="TextPlugin",
+                            language=language_code,
+                            body=translated_text,
+                        )
+                    """
+
                 # Publish the page changes
                 page.publish(language_code)
 
-        print("Generate")
+                # Make the homepage
+                if not homepage_set:
+                    page.set_as_homepage()
+
+            # After the first page (homepage is created) create all children
+            page_template = 'page.html'
+            homepage_set = True
+
         return
