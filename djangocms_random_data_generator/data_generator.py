@@ -4,7 +4,8 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.api import add_plugin, create_page, create_title, publish_page
+from cms.models import CMSPlugin, Placeholder, Page, Title
 
 
 class DataGenerator():
@@ -22,6 +23,7 @@ class DataGenerator():
 
         try:
             with transaction.atomic():
+                self.empty_db()
                 self.generate()
 
             self.end(False)
@@ -45,6 +47,17 @@ class DataGenerator():
         if error:
             print("Error!!!")
             print(error)
+
+    def empty_db(self):
+        """
+        Empty any entries in the DB!
+        """
+        CMSPlugin.objects.all().delete()
+        Placeholder.objects.all().delete()
+        Title.objects.all().delete()
+        Page.objects.all().delete()
+
+        return
 
     def generate(self):
 
@@ -80,5 +93,8 @@ class DataGenerator():
                         language=language_code,
                         body=translated_text,
                     )
+                # Publish the page changes
+                page.publish(language_code)
+
         print("Generate")
         return
