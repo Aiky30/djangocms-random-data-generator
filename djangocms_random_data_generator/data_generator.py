@@ -28,8 +28,10 @@ class DataGenerator():
 
         except Exception as err:
             self.end(err)
+            raise
         except:
             self.end(True)
+            raise
 
     def end(self, error=False):
 
@@ -37,8 +39,12 @@ class DataGenerator():
 
         import_duration = (self.end_time - self.start_time).total_seconds()
 
-        print("End:" % self.end_time)
-        print("Duration:" % import_duration)
+        print("End:%s" % str(self.end_time))
+        print("Duration:%s" % import_duration)
+
+        if error:
+            print("Error!!!")
+            print(error)
 
     def generate(self):
 
@@ -47,24 +53,32 @@ class DataGenerator():
         amount_of_plugins = range(1, 10)
         languages = settings.LANGUAGES
 
-        for page_number in amount_of_pages:
+        for page_index, page_arg in enumerate(amount_of_pages):
 
             page = None
 
-            for language in languages:
+            for language_index, language in enumerate(languages):
+
                 language_code = language[0]
+                language_name = language[1]
+                translated_text = settings.GENERATOR_LANGUAGES_TEXT[language_code]
+
+                page_title = "%s-%s" % (language_name, str(page_index))
 
                 # Create a new page or title
-                if page:
-                    create_title(language_code, "french inner", page)
+                if page is None:
+                    page = create_page(page_title, "homepage.html", language_code, published=True)
                 else:
-                    page = create_page("inner", "nav_playground.html", language_code, published=True)
+                    create_title(language_code, page_title, page)
 
                 # Add the plugins to the page
-                placeholder = page.placeholders.get(slot='body')
-                for plugin in enumerate(random.choice(amount_of_plugins)):
+                placeholder = page.placeholders.get(slot='placeholder_1')
+                for plugin in enumerate(range(0, random.choice(amount_of_plugins) )):
                     add_plugin(
                         placeholder=placeholder,
-                        plugin_type="PluginWithFKFromModel",
+                        plugin_type="TextPlugin",
                         language=language_code,
+                        body=translated_text,
                     )
+        print("Generate")
+        return

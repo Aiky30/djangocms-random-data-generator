@@ -107,7 +107,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'HOST': 'localhost',
-        'NAME': 'cms_logger',
+        'NAME': 'cms_data_generator',
         'PASSWORD': '',
         'PORT': '',
         'USER': 'postgres'
@@ -162,9 +162,18 @@ LANGUAGES = [
 ]
 
 CMS_TEMPLATES = [
-    ('home.html', 'Home page template'),
+    ('homepage.html', 'Home page template'),
 ]
 
+GENERATOR_LANGUAGES_TEXT = {
+    'en': 'Lorem ipsum dolor sit amet, put on her trial to be expanded on, or the obstinacy of no, it says to the contentions them. Even with the force seen him since the world to establish command it to say it. In order that none of the books of which the first, but not to tritani albucius, when an animal by the time of an. With these Zril be explained to him, and do not seek to know whether all of the top. But neither of these sensitivity.',
+    'de': 'Lorem ipsum dolor sit amet, auf ihrem Gericht gestellt werden erweitert, oder die Hartnäckigkeit nicht, sagt es das Vorbringen sie. Auch mit der Kraft ihn seit der Welt gesehen Befehl zu schaffen es, es zu sagen. Damit keines der Bücher, von denen die ersten, aber nicht albucius tritani, wenn ein Tier zum Zeitpunkt der ein. Mit diesem Zril ihn erklärt werden, und versuche nicht, ob alle oben zu kennen. Aber keiner dieser Empfindlichkeit.',
+}
+
+#Template, homepage, placeholder config of the page!!
+GENERATOR_TEMPLATE_PLACEHOLDER_CONFIG = {
+
+}
 """
 
 
