@@ -186,10 +186,5 @@ LOGGING = {
 }
 """
 
-CMS_TEMPLATES = (
-    ('col_two.html', 'two columns'),
-    ('col_three.html', 'three columns'),
-    ('nav_playground.html', 'navigation examples'),
-    ('simple.html', 'simple'),
-    ('static.html', 'static placeholders'),
-)
+
+
