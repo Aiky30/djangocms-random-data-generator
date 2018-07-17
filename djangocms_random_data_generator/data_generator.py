@@ -7,12 +7,27 @@ from django.utils import timezone
 from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.models import CMSPlugin, Placeholder, Page, Title
 
+from . import default_settings
+
+from django.core.management import call_command
+
+
+#TODO: Language not found in default list!!
 
 class DataGenerator():
 
     def __init__(self):
         self.start_time = ""
         self.end_time = ""
+        self.settings = self.load_default_settings()
+
+    def load_default_settings(self):
+
+        compiled_settings = settings
+
+        setattr(compiled_settings, 'GENERATOR_LANGUAGES_TEXT', default_settings.GENERATOR_LANGUAGES_TEXT)
+
+        return compiled_settings
 
     def start(self):
 
@@ -22,11 +37,12 @@ class DataGenerator():
             'start_time': self.start_time})
 
         try:
+            stats = None
             with transaction.atomic():
                 self.empty_db()
-                self.generate()
+                stats = self.generate()
 
-            self.end(False)
+            self.end(False, stats)
 
         except Exception as err:
             self.end(err)
@@ -35,7 +51,7 @@ class DataGenerator():
             self.end(True)
             raise
 
-    def end(self, error=False):
+    def end(self, error=False, stats=None):
 
         self.end_time = timezone.now()
 
@@ -43,6 +59,9 @@ class DataGenerator():
 
         print("Ended at: %s" % str(self.end_time))
         print("Duration (secs): %s" % import_duration)
+
+        if stats:
+            print("Stats: %s" % stats)
 
         if error:
             print("Error!!!")
@@ -53,10 +72,8 @@ class DataGenerator():
         Empty any entries in the DB!
         """
         print("Emptying DB")
-        CMSPlugin.objects.all().delete()
-        Placeholder.objects.all().delete()
-        Title.objects.all().delete()
-        Page.objects.all().delete()
+
+        call_command('flush') # more options: verbosity=0, interactive=False
 
         return
 
@@ -65,9 +82,14 @@ class DataGenerator():
         print("Populating DB")
 
         # Generate pages
-        amount_of_pages = range(0, settings.GENERATOR_PAGE_NUMBERS)
-        languages = settings.LANGUAGES
+        amount_of_pages = range(0, self.settings.GENERATOR_PAGE_NUMBERS)
+        languages = self.settings.LANGUAGES
         homepage_set = False
+
+        print(str({
+            'page count: ': self.settings.GENERATOR_PAGE_NUMBERS,
+            'languages ': len(languages)
+        }))
 
         # Use the homepage as the first template
         page_template = 'homepage.html'
@@ -80,7 +102,7 @@ class DataGenerator():
 
                 language_code = language[0]
                 language_name = language[1]
-                translated_text = settings.GENERATOR_LANGUAGES_TEXT[language_code]
+                translated_text = self.settings.GENERATOR_LANGUAGES_TEXT[language_code]
 
                 page_title = "%s-%s" % (language_name, str(page_index))
 
@@ -121,4 +143,6 @@ class DataGenerator():
             page_template = 'page.html'
             homepage_set = True
 
-        return
+        return {
+            'pages created count: ': Page.objects.all().count(),
+        }
