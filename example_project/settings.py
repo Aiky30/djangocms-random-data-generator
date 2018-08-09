@@ -159,27 +159,15 @@ SITE_ID = 1
 LANGUAGES = [
     ('en', 'English'),
     ('de', 'German'),
-    ('ng', 'Yoruba'),
-    ('ag', 'A'),
-    ('bg', 'B'),
-    ('cg', 'C'),
-    ('dg', 'D'),
-    ('eg', 'E'),
-    ('fg', 'F'),
-    ('gg', 'G'),
-    ('hg', 'H'),
-    ('ig', 'I'),
-    ('jg', 'J'),
-    ('kg', 'K'),
-    ('lg', 'L'),
-    ('mg', 'M'),
+    ('af', 'Afrikaans'),
+    ('ja', 'Japanese'),
+    ('zh-hans', 'Simplified Chinese'),
 ]
 
 CMS_TEMPLATES = [
     ('homepage.html', 'Home page template'),
     ('page.html', 'Page template'),
 ]
-
 
 
 GENERATOR_PAGE_NUMBERS = 100

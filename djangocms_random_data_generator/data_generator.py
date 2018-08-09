@@ -14,7 +14,7 @@ from django.core.management import call_command
 
 #TODO: Language not found in default list!!
 
-class DataGenerator():
+class DataGenerator:
 
     def __init__(self):
         self.start_time = ""
@@ -25,7 +25,9 @@ class DataGenerator():
 
         compiled_settings = settings
 
+        # FIXME: Need to automate this
         setattr(compiled_settings, 'GENERATOR_LANGUAGES_TEXT', default_settings.GENERATOR_LANGUAGES_TEXT)
+        setattr(compiled_settings, 'GENERATOR_POPULATE_PAGES', default_settings.GENERATOR_POPULATE_PAGES)
 
         return compiled_settings
 
@@ -77,6 +79,30 @@ class DataGenerator():
 
         return
 
+    def populate_page(self, page, language_code):
+
+        translated_text = self.settings.GENERATOR_LANGUAGES_TEXT[language_code]
+
+        # FIXME: Get the placeholders available from the pages
+        # Add the plugins to the page
+        for placeholder in page.placeholders.all():
+            # Add a text plugin
+            add_plugin(
+                placeholder=placeholder,
+                plugin_type="TextPlugin",
+                language=language_code,
+                body=translated_text,
+            )
+            """
+            for plugin in enumerate(range(0, random.choice(amount_of_plugins) )):
+                add_plugin(
+                    placeholder=placeholder,
+                    plugin_type="TextPlugin",
+                    language=language_code,
+                    body=translated_text,
+                )
+            """
+
     def generate(self):
 
         print("Populating DB")
@@ -102,7 +128,7 @@ class DataGenerator():
 
                 language_code = language[0]
                 language_name = language[1]
-                translated_text = self.settings.GENERATOR_LANGUAGES_TEXT[language_code]
+
 
                 page_title = "%s-%s" % (language_name, str(page_index))
 
@@ -112,25 +138,8 @@ class DataGenerator():
                 else:
                     create_title(language_code, page_title, page)
 
-                # FIXME: Get the placeholders available from the pages
-                # Add the plugins to the page
-                for placeholder in page.placeholders.all():
-                    # Add a text plugin
-                    add_plugin(
-                        placeholder=placeholder,
-                        plugin_type="TextPlugin",
-                        language=language_code,
-                        body=translated_text,
-                    )
-                    """
-                    for plugin in enumerate(range(0, random.choice(amount_of_plugins) )):
-                        add_plugin(
-                            placeholder=placeholder,
-                            plugin_type="TextPlugin",
-                            language=language_code,
-                            body=translated_text,
-                        )
-                    """
+                if self.settings.GENERATOR_POPULATE_PAGES:
+                    self.populate_page(page, language_code)
 
                 # Publish the page changes
                 page.publish(language_code)
