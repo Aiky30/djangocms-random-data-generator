@@ -164,10 +164,13 @@ LANGUAGES = [
     ('zh-hans', 'Simplified Chinese'),
 ]
 
+
+
 CMS_TEMPLATES = [
     ('homepage.html', 'Home page template'),
     ('page.html', 'Page template'),
 ]
+
 
 
 GENERATOR_PAGE_NUMBERS = 100
