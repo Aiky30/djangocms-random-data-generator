@@ -76,6 +76,7 @@ class DataGenerator:
         print("Emptying DB")
 
         call_command('flush') # more options: verbosity=0, interactive=False
+        call_command('migrate')
 
         return
 
