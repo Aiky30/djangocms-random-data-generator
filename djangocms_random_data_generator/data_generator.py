@@ -86,7 +86,7 @@ class DataGenerator:
 
         # FIXME: Get the placeholders available from the pages
         # Add the plugins to the page
-        for placeholder in page.placeholders.all():
+        for placeholder in page.get_placeholders(language_code):
             # Add a text plugin
             add_plugin(
                 placeholder=placeholder,
@@ -130,7 +130,6 @@ class DataGenerator:
                 language_code = language[0]
                 language_name = language[1]
 
-
                 page_title = "%s-%s" % (language_name, str(page_index))
 
                 # Create a new page or title
@@ -142,8 +141,9 @@ class DataGenerator:
                 if self.settings.GENERATOR_POPULATE_PAGES:
                     self.populate_page(page, language_code)
 
-                # Publish the page changes
-                page.publish(language_code)
+                # Publish the page changes - pre cms 4 compatibility
+                if hasattr(page, 'publish'):
+                    page.publish(language_code)
 
                 # Make the homepage
                 if not homepage_set:

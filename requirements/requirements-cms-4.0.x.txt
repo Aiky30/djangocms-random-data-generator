@@ -1,0 +1,2 @@
+-r base.txt
+https://github.com/divio/django-cms/archive/release/4.0.x.zip

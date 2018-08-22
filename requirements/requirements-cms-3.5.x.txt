@@ -1,0 +1,2 @@
+-r base.txt
+django-cms==3.5.2
