@@ -8,7 +8,7 @@ setup(
     author='Aikman Ltd',
     author_email='aiky30@yahoo.com',
     description='A data generator for the Django CMS library',
-    long_description=read('README.md'),
+    long_description='README.md',
     license='LGPL',
     packages=[],
     include_package_data=True,
